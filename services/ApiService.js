@@ -5,7 +5,7 @@ async function takeAction(action, dataValue) {
   console.log("datavalue: ", dataValue)
   console.log(process.env.NUXT_APP_EOS_CONTRACT_NAME)
   const privateKey = localStorage.getItem("cardgame_key")
-  const rpc = new JsonRpc("http://localhost:8888") //process.env.NUXT_APP_EOS_API_ENDPOINT)
+  const rpc = new JsonRpc(process.env.NUXT_APP_EOS_API_ENDPOINT)
   const signatureProvider = new JsSignatureProvider([privateKey])
   console.log('private_key: ', privateKey)
   const api = new Api({
@@ -17,7 +17,7 @@ async function takeAction(action, dataValue) {
   try {
     const resultWithConfig = await api.transact({
       actions: [{
-        account: "cardgame", // process.env.NUXT_APP_EOS_CONTRACT_NAME,
+        account: process.env.NUXT_APP_EOS_CONTRACT_NAME,
         name: action,
         authorization: [{
           actor: localStorage.getItem('cardgame_account'),
