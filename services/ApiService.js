@@ -1,4 +1,4 @@
-import { Api, JsonRpc } from 'eosjs'
+import { Api, JsonRpc, RpcError } from 'eosjs'
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig'
 
 async function takeAction(action, dataValue) {
@@ -49,6 +49,38 @@ class apiService {
           localStorage.removeItem('cardgame_key')
           reject(err)
         })
+    })
+  }
+  static async getUserByName(username) {
+    try {
+      const rpc = new JsonRpc(process.env.NUXT_APP_EOS_API_ENDPOINT)
+      const result = await rpc.get_table_rows({
+        "json": true,
+        "code": process.env.NUXT_APP_EOS_CONTRACT_NAME,
+        "scope": process.env.NUXT_APP_EOS_CONTRACT_NAME,
+        "table": "users",
+        "limit": 1,
+        "lowerbound": username
+      })
+      return result.rows[0]
+    } catch (err) {
+      console.error(err)
+    }
+  }
+  static getCurrentUser() {
+    return new Promise((resolve, reject) => {
+      if(!localStorage.getItem("cardgame_account")) {
+        return reject()
+      }
+      takeAction("login", {username: localStorage.getItem('cardgame_account')})
+      .then(() => {
+        resolve(localStorage.getItem("cardgame_account"))
+      })
+      .catch(err => {
+        localStorage.removeItem("cardgame_account")
+        localStorage.removeItem("cardgame_key")
+        reject(err);
+      })
     })
   }
 }
